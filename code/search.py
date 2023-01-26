@@ -109,7 +109,39 @@ def uniformCostSearch(problem):
     """
         INSÉREZ VOTRE SOLUTION À LA QUESTION 3 ICI
     """
+    init_pos=problem.getStartState()
+    fringe=[(init_pos,None,0,None)] # node structure =[pos,action,cost,parent]
+    already_seen=[] #list where we stock every visited node
+    control=[]
+    node=fringe.pop(0) #exploration of the graph
+    while not problem.isGoalState(node[0]):
+        successor=problem.getSuccessors(node[0])
+        already_seen.append(node)
+        control.append(node[0])
+        for node_neigh in successor:
+            if not node_neigh[0] in control:
+                fringe.append((node_neigh[0],node_neigh[1],node_neigh[2],node))
+        
+        # choix du noeud de cout le plus faible
+        node=fringe[0]
+        cost=node[2]
+        index=0
+        for i,n in enumerate(fringe):
+            if n[2]<cost:
+                cost=n[2]
+                node=n
+                index=i
+        fringe.pop(index)
+        
 
+    actions_list=[]
+    action=node[1]
+    while action: #On remonte la liste chainée à partir du noeud objectif pour trouver le chemin.
+        actions_list.append(action)
+        node=node[3]
+        action=node[1]
+
+    return actions_list[::-1]
 
 def nullHeuristic(state, problem=None):
     """
