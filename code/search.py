@@ -102,6 +102,36 @@ def breadthFirstSearch(problem):
         INSÉREZ VOTRE SOLUTION À LA QUESTION 2 ICI
     """
 
+    init_pos=problem.getStartState()
+    fifo=[(init_pos,None,0,None)] # node structure =[pos,action,cost,parent]
+    already_seen=[] #list where we stock every visited node in chained tuple
+    control=[] #list where we stock every visited postition
+    node=fifo.pop(0) #exploration of the graph
+    while not problem.isGoalState(node[0]):
+        successor=problem.getSuccessors(node[0])
+        already_seen.append(node)
+        control.append(node[0])
+        for node_neigh in successor:
+            if not node_neigh[0] in control:
+                fifo.append((node_neigh[0],node_neigh[1],node_neigh[2],node))
+        node=fifo.pop(0)
+    
+    actions_list=[]
+    action=node[1]
+    while action: #On remonte la liste chainée à partir du noeud objectif pour trouver le chemin.
+        actions_list.append(action)
+        node=node[3]
+        action=node[1]
+
+    return actions_list[::-1]
+    
+
+
+
+
+
+
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
