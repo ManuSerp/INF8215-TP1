@@ -145,6 +145,12 @@ def breadthFirstSearch(problem):
 
     return actions_list[::-1]
 
+def chain_cost(node):
+    cost=0
+    while node:
+        cost=cost+node[2]
+        node=node[3]
+    return cost
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -164,18 +170,19 @@ def uniformCostSearch(problem):
         successor = problem.getSuccessors(node[0])
         already_seen.append(node)
         for node_neigh in successor:
-            if node_neigh[0] not in control:
+            if (node_neigh[0]) not in control or problem.isGoalState(node_neigh[0]): #or problem.isGoalState(node_neigh[0])
                 control.append(node_neigh[0])
 
                 fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
 
         # choix du noeud de cout le plus faible
         node = fringe[0]
-        cost = node[2]
+        cost = chain_cost(node)
         index = 0
         for i, n in enumerate(fringe):
-            if n[2] < cost:
-                cost = n[2]
+            n_cost=chain_cost(n)
+            if n_cost < cost:
+                cost = n_cost
                 node = n
                 index = i
         fringe.pop(index)
