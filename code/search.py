@@ -125,12 +125,14 @@ def breadthFirstSearch(problem):
     already_seen = []  # list where we stock every visited node in chained tuple
     control = []  # list where we stock every visited postition
     node = fifo.pop(0)  # exploration of the graph
+    control.append(node[0])
     while not problem.isGoalState(node[0]):
         successor = problem.getSuccessors(node[0])
         already_seen.append(node)
-        control.append(node[0])
         for node_neigh in successor:
-            if not node_neigh[0] in control:
+            if node_neigh[0] not in control:
+                control.append(node_neigh[0])
+
                 fifo.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
         node = fifo.pop(0)
 
@@ -154,14 +156,17 @@ def uniformCostSearch(problem):
     fringe = [(init_pos, None, 0, None)]  # node structure =[pos,action,cost,parent]
     already_seen = []  # list where we stock every visited node in chained tuple
     control = []  # list where we stock every visited position
+    
     node = fringe.pop(0)  # exploration of the graph
+    control.append(node[0])
 
     while not problem.isGoalState(node[0]):
         successor = problem.getSuccessors(node[0])
         already_seen.append(node)
-        control.append(node[0])
         for node_neigh in successor:
-            if not node_neigh[0] in control:
+            if node_neigh[0] not in control:
+                control.append(node_neigh[0])
+
                 fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
 
         # choix du noeud de cout le plus faible
