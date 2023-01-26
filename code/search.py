@@ -111,9 +111,10 @@ def uniformCostSearch(problem):
     """
     init_pos=problem.getStartState()
     fringe=[(init_pos,None,0,None)] # node structure =[pos,action,cost,parent]
-    already_seen=[] #list where we stock every visited node
-    control=[]
+    already_seen=[] #list where we stock every visited node in chained tuple
+    control=[] #list where we stock every visited position
     node=fringe.pop(0) #exploration of the graph
+   
     while not problem.isGoalState(node[0]):
         successor=problem.getSuccessors(node[0])
         already_seen.append(node)
