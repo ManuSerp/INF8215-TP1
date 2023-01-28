@@ -107,7 +107,7 @@ def depthFirstSearch(problem):
         node = fringe.pop()
 
     direction = []
-    while node[3] is not None:
+    while node[3]:
         direction.append(node[1])
         node = node[3]
     return direction[::-1]
@@ -145,12 +145,14 @@ def breadthFirstSearch(problem):
 
     return actions_list[::-1]
 
+
 def chain_cost(node):
-    cost=0
+    cost = 0
     while node:
-        cost=cost+node[2]
-        node=node[3]
+        cost = cost + node[2]
+        node = node[3]
     return cost
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -162,7 +164,7 @@ def uniformCostSearch(problem):
     fringe = [(init_pos, None, 0, None)]  # node structure =[pos,action,cost,parent]
     already_seen = []  # list where we stock every visited node in chained tuple
     control = []  # list where we stock every visited position
-    
+
     node = fringe.pop(0)  # exploration of the graph
     control.append(node[0])
 
@@ -170,9 +172,9 @@ def uniformCostSearch(problem):
         successor = problem.getSuccessors(node[0])
         already_seen.append(node)
         for node_neigh in successor:
-            if (node_neigh[0]) not in control or problem.isGoalState(node_neigh[0]): #or problem.isGoalState(node_neigh[0])
+            if (node_neigh[0]) not in control or problem.isGoalState(
+                    node_neigh[0]):
                 control.append(node_neigh[0])
-
                 fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
 
         # choix du noeud de cout le plus faible
@@ -180,7 +182,7 @@ def uniformCostSearch(problem):
         cost = chain_cost(node)
         index = 0
         for i, n in enumerate(fringe):
-            n_cost=chain_cost(n)
+            n_cost = chain_cost(n)
             if n_cost < cost:
                 cost = n_cost
                 node = n
@@ -196,6 +198,7 @@ def uniformCostSearch(problem):
 
     return actions_list[::-1]
 
+
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -209,7 +212,43 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """
         INSÉREZ VOTRE SOLUTION À LA QUESTION 4 ICI
     """
+    init_pos = problem.getStartState()
+    fringe = [(init_pos, None, 0, None)]  # node structure =[pos,action,cost,parent]
+    already_seen = []  # list where we stock every visited node in chained tuple
+    control = []  # list where we stock every visited position
 
+    node = fringe.pop(0)  # exploration of the graph
+    control.append(node[0])
+
+    while not problem.isGoalState(node[0]):
+        successor = problem.getSuccessors(node[0])
+        already_seen.append(node)
+        for node_neigh in successor:
+            if (node_neigh[0]) not in control or problem.isGoalState(
+                    node_neigh[0]):
+                control.append(node_neigh[0])
+                fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
+
+        # choix du noeud de cout le plus faible
+        node = fringe[0]
+        cost = chain_cost(node) + heuristic(node[0], problem)
+        index = 0
+        for i, n in enumerate(fringe):
+            n_cost = chain_cost(n) + heuristic(n[0], problem)
+            if n_cost < cost:
+                cost = n_cost
+                node = n
+                index = i
+        fringe.pop(index)
+
+    actions_list = []
+    action = node[1]
+    while action:  # On remonte la liste chainée à partir du noeud objectif pour trouver le chemin.
+        actions_list.append(action)
+        node = node[3]
+        action = node[1]
+
+    return actions_list[::-1]
 
 
 # Abbreviations
