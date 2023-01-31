@@ -166,16 +166,21 @@ def uniformCostSearch(problem):
     control = []  # list where we stock every visited position
 
     node = fringe.pop(0)  # exploration of the graph
-    control.append(node[0])
 
     while not problem.isGoalState(node[0]):
-        successor = problem.getSuccessors(node[0])
-        already_seen.append(node)
-        for node_neigh in successor:
-            if (node_neigh[0]) not in control or problem.isGoalState(
-                    node_neigh[0]):
-                control.append(node_neigh[0])
-                fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
+        
+        
+        if node[0] not in control:
+        
+            already_seen.append(node)
+        
+            control.append(node[0])
+            successor = problem.getSuccessors(node[0])
+
+
+            for node_neigh in successor:
+                if (node_neigh[0]) not in control:
+                    fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
 
         # choix du noeud de cout le plus faible
         node = fringe[0]
@@ -218,16 +223,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     control = []  # list where we stock every visited position
 
     node = fringe.pop(0)  # exploration of the graph
-    control.append(node[0])
 
     while not problem.isGoalState(node[0]):
-        successor = problem.getSuccessors(node[0])
-        already_seen.append(node)
-        for node_neigh in successor:
-            if (node_neigh[0]) not in control or problem.isGoalState(
-                    node_neigh[0]):
-                control.append(node_neigh[0])
-                fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
+
+        if node[0] not in control:
+            control.append(node[0])
+
+            successor = problem.getSuccessors(node[0])
+            already_seen.append(node)
+            for node_neigh in successor:
+                if (node_neigh[0]) not in control:
+                    fringe.append((node_neigh[0], node_neigh[1], node_neigh[2], node))
 
         # choix du noeud de cout le plus faible
         node = fringe[0]
