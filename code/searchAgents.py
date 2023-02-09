@@ -607,9 +607,61 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    foods = []
+    for i in range(len(foodGrid.data)):
+        for j in range(len(foodGrid.data[i])):
+            if foodGrid.data[i][j]:
+                foods.append((i, j))
 
+    the_farthest = position
+    for food in foods:
+        if distance_manhattan(position, food) > distance_manhattan(position, the_farthest):
+            the_farthest = food
+
+    flip = False
     """
         INSÉREZ VOTRE SOLUTION À LA QUESTION 7 ICI
     """
+    if problem.isGoalState(state):
+        return 0
 
-    pass
+    else:
+        cost = 0
+        closest = (99999, 99999)
+        previous_closest = (99999, 99999)
+        compare = position
+        index = 0
+        previous_index = 0
+
+        flag = True
+        while(flag):
+            flag = False
+            # print(len(foods))
+            for i, f in enumerate(foods):
+
+                flag = True
+                if distance_manhattan(compare, f) < distance_manhattan(
+                        compare, closest):
+                    previous_closest = closest
+                    closest = f
+                    previous_index = index
+                    index = i
+
+            if distance_manhattan(previous_closest, the_farthest) > distance_manhattan(closest, the_farthest) and previous_closest[0] != 99999 and flip:
+                flip = False
+                index = previous_index
+                closest = previous_closest
+
+            if flag:
+
+                foods.pop(index)
+
+                cost += distance_manhattan(compare, closest)
+            compare = closest
+            closest = (99999, 99999)
+            previous_closest = (99999, 99999)
+            index = 0
+            previous_index = 0
+
+    print(cost)
+    return cost
