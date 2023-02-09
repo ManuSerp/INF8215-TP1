@@ -442,6 +442,10 @@ def distance_vect(v1, v2):
     return ((v1[0] - v2[0]) ** 2 + (v1[1] - v2[1]) ** 2) ** 0.5
 
 
+def distance_manhattan(v1, v2):
+    return abs(v1[0] - v2[0]) + abs(v1[1] - v2[1])
+
+
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -482,13 +486,13 @@ def cornersHeuristic(state, problem):
             for i, b in enumerate(state[1]):
                 if b == False and i not in chosen:
                     flag = True
-                    if distance_vect(compare, corners[i]) < distance_vect(
+                    if distance_manhattan(compare, corners[i]) < distance_manhattan(
                             compare, closest):
                         closest = corners[i]
                         index = i
 
             if flag:
-                cost += distance_vect(compare, closest)
+                cost += distance_manhattan(compare, closest)
             chosen.append(index)
             compare = closest
             closest = (99999, 99999)
