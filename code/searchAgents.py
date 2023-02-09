@@ -618,7 +618,7 @@ def foodHeuristic(state, problem: FoodSearchProblem):
         if distance_manhattan(position, food) > distance_manhattan(position, the_farthest):
             the_farthest = food
 
-    flip = False
+    flip = True
     """
         INSÉREZ VOTRE SOLUTION À LA QUESTION 7 ICI
     """
@@ -637,6 +637,7 @@ def foodHeuristic(state, problem: FoodSearchProblem):
         while(flag):
             flag = False
             # print(len(foods))
+
             for i, f in enumerate(foods):
 
                 flag = True
@@ -651,7 +652,8 @@ def foodHeuristic(state, problem: FoodSearchProblem):
                 flip = False
                 index = previous_index
                 closest = previous_closest
-
+                print("flip")
+            flip = False
             if flag:
 
                 foods.pop(index)
