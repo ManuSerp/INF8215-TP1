@@ -92,7 +92,8 @@ class SearchAgent(Agent):
 
         # Get the search function from the name and heuristic
         if fn not in dir(search):
-            raise AttributeError(fn + " is not a search function in search.py.")
+            raise AttributeError(
+                fn + " is not a search function in search.py.")
         func = getattr(search, fn)
         if "heuristic" not in func.__code__.co_varnames:
             print("[SearchAgent] using function " + fn)
@@ -106,7 +107,8 @@ class SearchAgent(Agent):
                 raise AttributeError(
                     heuristic + " is not a function in searchAgents.py or search.py."
                 )
-            print("[SearchAgent] using function %s and heuristic %s" % (fn, heuristic))
+            print("[SearchAgent] using function %s and heuristic %s" %
+                  (fn, heuristic))
             # Note: this bit of Python trickery combines the search algorithm and the heuristic
             self.searchFunction = lambda x: func(x, heuristic=heur)
 
@@ -210,7 +212,8 @@ class PositionSearchProblem(search.SearchProblem):
             import __main__
 
             if "_display" in dir(__main__):
-                if "drawExpandedCells" in dir(__main__._display):  # @UndefinedVariable
+                # @UndefinedVariable
+                if "drawExpandedCells" in dir(__main__._display):
                     __main__._display.drawExpandedCells(
                         self._visitedlist
                     )  # @UndefinedVariable
@@ -281,7 +284,7 @@ class StayEastSearchAgent(SearchAgent):
 
     def __init__(self):
         self.searchFunction = search.uniformCostSearch
-        costFn = lambda pos: 0.5 ** pos[0]
+        def costFn(pos): return 0.5 ** pos[0]
         self.searchType = lambda state: PositionSearchProblem(
             state, costFn, (1, 1), None, False
         )
@@ -297,7 +300,7 @@ class StayWestSearchAgent(SearchAgent):
 
     def __init__(self):
         self.searchFunction = search.uniformCostSearch
-        costFn = lambda pos: 2 ** pos[0]
+        def costFn(pos): return 2 ** pos[0]
         self.searchType = lambda state: PositionSearchProblem(state, costFn)
 
 
@@ -388,7 +391,7 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-        
+
         successors = []
         for action in [
             Directions.NORTH,
@@ -410,12 +413,12 @@ class CornersProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
-            
+
             if not hitsWall:
-                nextState =  ((nextx, nexty), state[1])
+                nextState = ((nextx, nexty), state[1])
                 newState = self._set_corner_values(nextState)
                 successors.append([newState, action, 1])
-            
+
         self._expanded += 1  # DO NOT CHANGE
         return successors
 
@@ -435,6 +438,14 @@ class CornersProblem(search.SearchProblem):
         return len(actions)
 
 
+def distance_vect(v1, v2):
+    return ((v1[0] - v2[0]) ** 2 + (v1[1] - v2[1]) ** 2) ** 0.5
+
+
+def distance_manhattan(v1, v2):
+    return abs(v1[0] - v2[0]) + abs(v1[1] - v2[1])
+
+
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -449,19 +460,52 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
     """
     corners = problem.corners  # These are the corner coordinates
-    walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
+    # These are the walls of the maze, as a Grid (game.py)
+    walls = problem.walls
 
     """
         INSÉREZ VOTRE SOLUTION À LA QUESTION 6 ICI
+
+
     """
-    return 0
+
+    if problem.isGoalState(state):
+        return 0
+
+    else:
+        cost = 0
+        corners = problem.corners
+        closest = (99999, 99999)
+        index = 0
+        chosen = []
+        compare = state[0]
+
+        flag = True
+        while(flag):
+            flag = False
+            for i, b in enumerate(state[1]):
+                if b == False and i not in chosen:
+                    flag = True
+                    if distance_manhattan(compare, corners[i]) < distance_manhattan(
+                            compare, closest):
+                        closest = corners[i]
+                        index = i
+
+            if flag:
+                cost += distance_manhattan(compare, closest)
+            chosen.append(index)
+            compare = closest
+            closest = (99999, 99999)
+    # print(cost)
+    return cost
 
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
 
     def __init__(self):
-        self.searchFunction = lambda prob: search.aStarSearch(prob, cornersHeuristic)
+        self.searchFunction = lambda prob: search.aStarSearch(
+            prob, cornersHeuristic)
         self.searchType = CornersProblem
 
 
@@ -529,7 +573,8 @@ class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
 
     def __init__(self):
-        self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
+        self.searchFunction = lambda prob: search.aStarSearch(
+            prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
 
@@ -562,9 +607,63 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    foods = []
+    for i in range(len(foodGrid.data)):
+        for j in range(len(foodGrid.data[i])):
+            if foodGrid.data[i][j]:
+                foods.append((i, j))
 
+    the_farthest = position
+    for food in foods:
+        if distance_manhattan(position, food) > distance_manhattan(position, the_farthest):
+            the_farthest = food
+
+    flip = True
     """
         INSÉREZ VOTRE SOLUTION À LA QUESTION 7 ICI
     """
+    if problem.isGoalState(state):
+        return 0
 
-    pass
+    else:
+        cost = 0
+        closest = (99999, 99999)
+        previous_closest = (99999, 99999)
+        compare = position
+        index = 0
+        previous_index = 0
+
+        flag = True
+        while(flag):
+            flag = False
+            # print(len(foods))
+
+            for i, f in enumerate(foods):
+
+                flag = True
+                if distance_manhattan(compare, f) < distance_manhattan(
+                        compare, closest):
+                    previous_closest = closest
+                    closest = f
+                    previous_index = index
+                    index = i
+
+            if distance_manhattan(previous_closest, the_farthest) > distance_manhattan(closest, the_farthest) and previous_closest[0] != 99999 and flip:
+                flip = False
+                index = previous_index
+                closest = previous_closest
+                print("flip")
+            flip = False
+            if flag:
+
+                foods.pop(index)
+
+                cost += distance_manhattan(compare, closest)
+            compare = closest
+            closest = (99999, 99999)
+            previous_closest = (99999, 99999)
+            index = 0
+            previous_index = 0
+
+    print(cost)
+    return cost
