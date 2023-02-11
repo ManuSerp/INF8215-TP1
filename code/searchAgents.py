@@ -533,6 +533,10 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 
+def manhattan_distance(xy1, xy2):
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+
 def foodHeuristic(state, problem: FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -562,9 +566,21 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    if problem.isGoalState(state):
+        return 0
+    food_list = foodGrid.asList()
+    # Approche Programmation dynamique avec Greedy algorithm pour coût
+    # Construction de la matrice position courante et food restante
+    positions = [position] + food_list
+    cost_deplacement = [[0 for i in range(len(positions))] for j in range(len(positions))]
+    for i in range(len(positions)):
+        for j in range(i, len(positions)):
+            cost_deplacement[i][j] = manhattan_distance(positions[i], positions[j])
 
-    """
-        INSÉREZ VOTRE SOLUTION À LA QUESTION 7 ICI
-    """
-
-    pass
+    # On navigue la matrice pour cherche le plus grand coût entre les positions
+    cost = 0
+    for i in range(len(cost_deplacement)):
+        for j in range(i, len(cost_deplacement)):
+            if cost_deplacement[i][j] > cost:
+                cost = cost_deplacement[i][j]
+    return cost
