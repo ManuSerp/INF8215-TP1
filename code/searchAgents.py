@@ -578,6 +578,10 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchType = FoodSearchProblem
 
 
+def manhattan_distance(xy1, xy2):
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+
 def foodHeuristic(state, problem: FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -607,63 +611,22 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    foods = []
-    for i in range(len(foodGrid.data)):
-        for j in range(len(foodGrid.data[i])):
-            if foodGrid.data[i][j]:
-                foods.append((i, j))
-
-    the_farthest = position
-    for food in foods:
-        if distance_manhattan(position, food) > distance_manhattan(position, the_farthest):
-            the_farthest = food
-
-    flip = True
-    """
-        INSÉREZ VOTRE SOLUTION À LA QUESTION 7 ICI
-    """
     if problem.isGoalState(state):
         return 0
+    food_list = foodGrid.asList()
+    # Approche Programmation dynamique avec Greedy algorithm pour coût
+    # Construction de la matrice position courante et food restante
+    positions = [position] + food_list
+    cost_deplacement = [[0 for i in range(len(positions))] for j in range(len(positions))]
+    for i in range(len(positions)):
+        for j in range(i, len(positions)):
+            cost_deplacement[i][j] = manhattan_distance(positions[i], positions[j])
 
-    else:
-        cost = 0
-        closest = (99999, 99999)
-        previous_closest = (99999, 99999)
-        compare = position
-        index = 0
-        previous_index = 0
+    # On navigue la matrice pour cherche le plus grand coût entre les positions
+    cost = 0
+    for i in range(len(cost_deplacement)):
+        for j in range(i, len(cost_deplacement)):
+            if cost_deplacement[i][j] > cost:
+                cost = cost_deplacement[i][j]
 
-        flag = True
-        while(flag):
-            flag = False
-            # print(len(foods))
-
-            for i, f in enumerate(foods):
-
-                flag = True
-                if distance_manhattan(compare, f) < distance_manhattan(
-                        compare, closest):
-                    previous_closest = closest
-                    closest = f
-                    previous_index = index
-                    index = i
-
-            if distance_manhattan(previous_closest, the_farthest) > distance_manhattan(closest, the_farthest) and previous_closest[0] != 99999 and flip:
-                flip = False
-                index = previous_index
-                closest = previous_closest
-                print("flip")
-            flip = False
-            if flag:
-
-                foods.pop(index)
-
-                cost += distance_manhattan(compare, closest)
-            compare = closest
-            closest = (99999, 99999)
-            previous_closest = (99999, 99999)
-            index = 0
-            previous_index = 0
-
-    print(cost)
     return cost
