@@ -1,4 +1,7 @@
 # search.py
+# Manu Serpette 2229693
+# Allen Yu 1958185
+# Marc-Antoine Bettez 1828113
 # ---------
 # Licensing Information:  You are free to use or extend these projects for
 # educational purposes provided that (1) you do not distribute or publish
